@@ -1,23 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+const GITHUB_CLIENT_ID = "b300d5a7a3f9dc006d48";
+const gitHubRedirectURL = "http://localhost:3001/api/auth/github";
+const path = "/";
+const API_URL = "http://localhost:3001";
 
 function App() {
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    const res = await axios.get(`${API_URL}/api/me`, { withCredentials: true });
+    setUser(res.data);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
+      {!user ? (
         <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+          href={`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${gitHubRedirectURL}?path=${path}&scope=user:email`}
         >
-          Learn React
+          LOGIN WITH GITHUB
         </a>
-      </header>
+      ) : (
+        <h1>Welcome {user.login}</h1>
+      )}
     </div>
   );
 }
